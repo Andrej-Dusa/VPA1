@@ -525,8 +525,14 @@
 
                 <div class="card">
                     <div class="card-body">
-                        <h5 class="card-title">Datatables</h5>
-                        <p>Add lightweight datatables to your project with using the <a href="https://github.com/fiduswriter/Simple-DataTables" target="_blank">Simple DataTables</a> library. Just add <code>.datatable</code> class name to any table you wish to conver to a datatable</p>
+                        <h5 class="card-title">Users</h5>
+                        <p>Table of users for admin</p>
+                        <div>
+                            <a href="add-user.html">
+                            <button type="button" class="btn btn-dark rounded-pill">Add</button>
+                            </a>
+                        </div>
+
 
                         <!-- Table with stripped rows -->
                         <table class="table datatable">
@@ -536,6 +542,7 @@
                                 <th scope="col">Name</th>
                                 <th scope="col">Email</th>
                                 <th scope="col">Admin</th>
+                                <th scope="col">Configuration</th>
                             </tr>
                             </thead>
                             <tbody>
@@ -545,6 +552,14 @@
                                 <td>[[${user.name}]]</td>
                                 <td>[[${user.email}]]</td>
                                 <td>[[${user.admin}]]</td>
+                                <td>
+                                    <a th:href="@{'/edit-user/' + ${user.id}}">
+                                        <button type="button" class="btn btn-dark rounded-pill">Edit</button>
+                                    </a>
+                                    <a th:href="@{'/delete-user/' + ${user.id}}">
+                                        <button type="button" class="btn btn-dark rounded-pill">Delete</button>
+                                    </a>
+                                </td>
                             </tr>
                             </th:block>
                             </tbody>
