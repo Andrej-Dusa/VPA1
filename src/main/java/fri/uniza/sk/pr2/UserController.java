@@ -33,13 +33,14 @@ public class UserController {
     }
 
     @PostMapping("/save-user")
-    public String saveUser(User user) {
+    public String saveUser(User user, RedirectAttributes ra) {
         userService.save(user);
+        ra.addFlashAttribute("message", "The account has been saved successfully.");
         return "redirect:/users.html";
     }
 
     @GetMapping("/edit-user/{id}")
-    public String editUser(@PathVariable("id") Long id, Model model, RedirectAttributes ra) {
+    public String editUser(@PathVariable("id") Long id, Model model) {
         try {
             User user = userService.get(id);
             model.addAttribute("user", user);
@@ -50,4 +51,32 @@ public class UserController {
             return "redirect:/users.html";
         }
     }
+
+    @GetMapping("/delete-user/{id}")
+    public String deleteUser(@PathVariable("id") Long id, RedirectAttributes ra) {
+        try {
+            userService.delete(id);
+            ra.addFlashAttribute("message", "The account was deleted successfully.");
+            return "redirect:/users.html";
+        } catch (UserNotFoundException e) {
+            return "redirect:/users.html";
+        }
+    }
+
+    @GetMapping("/login.html")
+    public String login(Model model) {
+        model.addAttribute("user", new User());
+        return "login";
+    }
+
+    @PostMapping("/afterLogin")
+    public String afterLogin(User user, RedirectAttributes ra) {
+        try {
+            userService.login(user.getName(), user.getPassword());
+            return "redirect:/";
+        } catch (UserNotFoundException e) {
+            return "redirect:/login.html";
+        }
+    }
+
 }

@@ -31,4 +31,20 @@ public class UserService {
       }
       throw new UserNotFoundException("Could not find any user with ID: " + id);
     }
+
+    public void delete(Long id) throws UserNotFoundException {
+        Long count = userRepository.countById(id);
+        if (count == 0 || count == null) {
+            throw new UserNotFoundException("Could not find any user with ID: " + id);
+        }
+        userRepository.deleteById(id);
+    }
+
+    public User login(String name, String password) throws UserNotFoundException {
+        User user = userRepository.findByNameAndPassword(name, password);
+        if (user == null) {
+            throw new UserNotFoundException("Could not find any account with this Username or Password");
+        }
+        return user;
+    }
 }
