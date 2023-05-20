@@ -11,5 +11,5 @@ public interface UserRepository extends CrudRepository<User, Long> {
 
     public User findByNameAndPassword(String name, String password);
 
-    public List<Task> getAllByTasksOfUser();
+    public List<Task> getAllTasksOfUser();
 }
