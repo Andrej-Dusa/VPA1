@@ -1,6 +1,7 @@
 package fri.uniza.sk.pr2;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -8,8 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-@RestController
-@RequestMapping(path = "user")
+@Controller
 public class UserController {
     private final UserService userService;
 
@@ -17,10 +17,10 @@ public class UserController {
         this.userService = userService;
     }
 
-    @GetMapping("/listOfUsers.html")
+    @GetMapping("/users.html")
     public String showUserList(Model model) {
         List<User> listOfUsers = userService.getAll();
         model.addAttribute("listOfUsers", listOfUsers);
-        return "listOfUsers";
+        return "users";
     }
 }
