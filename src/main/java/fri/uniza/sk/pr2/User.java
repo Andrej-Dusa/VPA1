@@ -2,16 +2,21 @@ package fri.uniza.sk.pr2;
 
 import jakarta.persistence.*;
 
+import java.util.List;
+
 @Entity
 @Table(name = "user", uniqueConstraints = @UniqueConstraint(columnNames =  "email"))
 public class User {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     private String name;
     private String password;
     private Boolean admin;
     private String email;
+    @OneToMany(targetEntity = Task.class, cascade = CascadeType.ALL)
+    @JoinColumn(name = "task_id", referencedColumnName = "id")
+    private List<Task> tasks;
 
     public User(String name, String password, Boolean admin, String email) {
         this.name = name;

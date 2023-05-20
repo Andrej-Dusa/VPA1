@@ -12,9 +12,11 @@ import java.util.List;
 @Controller
 public class UserController {
     private final UserService userService;
+    private final TaskRepository taskRepository;
 
-    public UserController(UserService userService) {
+    public UserController(UserService userService, TaskRepository taskRepository) {
         this.userService = userService;
+        this.taskRepository = taskRepository;
     }
 
     @GetMapping("/users.html")
@@ -40,7 +42,7 @@ public class UserController {
     }
 
     @GetMapping("/edit-user/{id}")
-    public String editUser(@PathVariable("id") Long id, Model model) {
+    public String editUser(@PathVariable("id") Long id, Model model, RedirectAttributes ra) {
         try {
             User user = userService.get(id);
             model.addAttribute("user", user);
@@ -48,6 +50,7 @@ public class UserController {
             model.addAttribute("submit", "Edit an account");
             return "add-user";
         } catch (UserNotFoundException e) {
+            ra.addFlashAttribute("message", "The account has been saved successfully.");
             return "redirect:/users.html";
         }
     }
@@ -75,8 +78,16 @@ public class UserController {
             userService.login(user.getName(), user.getPassword());
             return "redirect:/";
         } catch (UserNotFoundException e) {
+            ra.addFlashAttribute("message", "Account with this username or password does not exist.");
             return "redirect:/login.html";
         }
+    }
+
+    @GetMapping("/users.html")
+    public String showTaskList(Model model) {
+        List<Task> listOfTasks = taskRepository.;
+        model.addAttribute("listOfUsers", listOfTasks);
+        return "users";
     }
 
 }
