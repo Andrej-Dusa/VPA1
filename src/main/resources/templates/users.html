@@ -531,7 +531,7 @@
                         <h5 class="card-title">Users</h5>
                         <p>Table of users for admin</p>
                         <div>
-                            <a href="add-user.html">
+                            <a th:href="@{/add-task(userId=${user.id})}">
                             <button type="button" class="btn btn-dark rounded-pill">Add</button>
                             </a>
                         </div>

@@ -11,7 +11,7 @@ public class Task {
     private Long id;
     private String shortName;
     private String description;
-    @JsonFormat(pattern = "dd-mm-yyyy", shape = JsonFormat.Shape.STRING)
+    @JsonFormat(pattern = "YYYY-MM-DD", shape = JsonFormat.Shape.STRING)
     private String finishDate;
     @Enumerated(EnumType.ORDINAL)
     private Status status;

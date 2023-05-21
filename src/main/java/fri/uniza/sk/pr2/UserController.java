@@ -1,12 +1,19 @@
 package fri.uniza.sk.pr2;
 
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
+import java.util.Date;
 import java.util.List;
 
 @Controller
@@ -91,6 +98,7 @@ public class UserController {
             List<Task> listOfTasks = taskRepository.findAllByUser(user);
             model.addAttribute("listOfTasks", listOfTasks);
             model.addAttribute("id", user.getId());
+
             return "index";
         } catch (UserNotFoundException e) {
             return "redirect:/login.html";
@@ -98,11 +106,24 @@ public class UserController {
     }
 
     @GetMapping("/add-task.html")
-    public String addTask(Model model) {
-        model.addAttribute("task", new Task());
+    public String addTask(@RequestParam("userId") Long userId, Model model) throws UserNotFoundException {
+        Task task = new Task();
+        User user = userService.get(userId);
+        task.setUser(user);
+        model.addAttribute("task", task);
         model.addAttribute("title", "Create Task");
         model.addAttribute("submit", "Create Task");
         return "add-task";
+    }
+
+    @PostMapping("/save-task")
+    public String saveTask(Task task, @RequestParam("status") String status,
+                           @RequestParam("finishDate") String finishDate, RedirectAttributes ra) {
+        task.setFinishDate(finishDate);
+        task.setStatus(Status.valueOf(status));
+        taskRepository.save(task);
+        ra.addFlashAttribute("message", "The task was saved successfully.");
+        return "redirect:/" + task.getUser().getId();
     }
 
 }
