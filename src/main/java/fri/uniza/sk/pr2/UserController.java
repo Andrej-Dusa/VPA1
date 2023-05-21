@@ -28,24 +28,32 @@ public class UserController {
     }
 
     @GetMapping("/users.html")
-    public String showUserList(Model model) {
+    public String showUserList(Model model, HttpSession session) {
         List<User> listOfUsers = userService.getAll();
+        User user = (User)session.getAttribute("user");
+        model.addAttribute("user", user);
         model.addAttribute("listOfUsers", listOfUsers);
         return "users";
     }
 
     @GetMapping("/add-user.html")
-    public String addUser(Model model) {
+    public String addUser(Model model, HttpSession session) {
+        User user1 = (User) session.getAttribute("user");
         model.addAttribute("user", new User());
+        model.addAttribute("user1", user1);
         model.addAttribute("title", "Create an Account");
         model.addAttribute("submit", "Create an Account");
         return "add-user";
     }
 
     @PostMapping("/save-user")
-    public String saveUser(User user, RedirectAttributes ra) {
+    public String saveUser(User user, RedirectAttributes ra, HttpSession session) {
         userService.save(user);
         ra.addFlashAttribute("message", "The account has been saved successfully.");
+        User user1 = (User) session.getAttribute("user");
+        if(user1 == null) {
+            return "redirect:/login.html";
+        }
         return "redirect:/users.html";
     }
 
@@ -187,7 +195,7 @@ public class UserController {
         model.addAttribute("title", "Assign Task");
         model.addAttribute("submit", "Assign Task");
         model.addAttribute("listOfUsers", listOfUsers);
-        return "redirect:/assign-task.html";
+        return "assign-task-to";
     }
 
     @GetMapping("/edit-assign-task/{id}")

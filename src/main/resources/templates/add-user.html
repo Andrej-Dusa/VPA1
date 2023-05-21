@@ -89,8 +89,8 @@
                     <div class="invalid-feedback">Please enter your password!</div>
                   </div>
 
-                  <div class="col-12">
-                    <div class="form-check">
+                  <div class="col-12" th:if="${user1} != null and ${user1.admin}">
+                    <div class="form-check" >
                       <input class="form-check-input" name="terms" type="checkbox" value="" id="acceptTerms" th:field="*{admin}">
                       <label class="form-check-label" for="acceptTerms">Admin </label>
                     </div>
