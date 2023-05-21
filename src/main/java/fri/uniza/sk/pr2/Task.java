@@ -3,6 +3,9 @@ package fri.uniza.sk.pr2;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Table(name = "task")
 public class Task {
@@ -15,14 +18,14 @@ public class Task {
     private String finishDate;
     @Enumerated(EnumType.ORDINAL)
     private Status status;
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private User user;
+    @ManyToMany(mappedBy = "task",fetch = FetchType.LAZY)
+    private List<User> user = new ArrayList<>();
+
 
     public Task() {
     }
 
-    public Task(String shortName, String description, String finishDate, Status status, User user) {
+    public Task(String shortName, String description, String finishDate, Status status, List<User> user) {
         this.shortName = shortName;
         this.description = description;
         this.finishDate = finishDate;
@@ -70,11 +73,11 @@ public class Task {
         this.shortName = shortName;
     }
 
-    public User getUser() {
+    public List<User> getUser() {
         return user;
     }
 
-    public void setUser(User user) {
+    public void setUser(List<User> user) {
         this.user = user;
     }
 }

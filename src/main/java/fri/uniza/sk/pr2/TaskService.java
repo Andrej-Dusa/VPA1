@@ -42,4 +42,6 @@ public class TaskService {
         }
         return tasks;
     }
+
+    public List<Task> getAll() {return (List<Task>) taskRepository.findAll();}
 }

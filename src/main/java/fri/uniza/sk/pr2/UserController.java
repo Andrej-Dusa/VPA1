@@ -157,7 +157,30 @@ public class UserController {
 
     @GetMapping("/sign-out")
     public String signOut() {
-        return "/login";
+        return "redirect:/login";
+    }
+
+    @GetMapping("/assign-task.html")
+    public String showTaskList(Model model) {
+        List<Task> listOfTasks = taskService.getAll();
+        List<User> listOfUsers = userService.getAll();
+        model.addAttribute("listOfUsers", listOfUsers);
+        model.addAttribute("listOfTasks", listOfTasks);
+        return "assign-task";
+    }
+
+    @GetMapping("/add-task-to.html")
+    public String addTask(Model model) throws UserNotFoundException {
+        List<Task> listOfTasks = taskService.getAll();
+        List<User> listOfUsers = userService.getAll();
+        Task task = new Task();
+        task.setStatus(Status.OPEN);
+        model.addAttribute("task", task);
+        model.addAttribute("title", "Assign Task");
+        model.addAttribute("submit", "Assign Task");
+        model.addAttribute("listOfUsers", listOfUsers);
+        model.addAttribute("listOfTasks", listOfTasks);
+        return "add-task";
     }
 
 }
