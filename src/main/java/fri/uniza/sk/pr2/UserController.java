@@ -19,11 +19,11 @@ import java.util.List;
 @Controller
 public class UserController {
     private final UserService userService;
-    private final TaskRepository taskRepository;
+    private final TaskService taskService;
 
-    public UserController(UserService userService, TaskRepository taskRepository) {
+    public UserController(UserService userService, TaskService taskService) {
         this.userService = userService;
-        this.taskRepository = taskRepository;
+        this.taskService = taskService;
     }
 
     @GetMapping("/users.html")
@@ -95,13 +95,14 @@ public class UserController {
     public String showTaskList(@PathVariable("id") Long id, Model model) {
         try {
             User user = userService.get(id);
-            List<Task> listOfTasks = taskRepository.findAllByUser(user);
+            List<Task> listOfTasks = taskService.getAllByUser(user);
             model.addAttribute("listOfTasks", listOfTasks);
             model.addAttribute("id", user.getId());
-
             return "index";
         } catch (UserNotFoundException e) {
             return "redirect:/login.html";
+        } catch (TaskNotFoundException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -110,6 +111,7 @@ public class UserController {
         Task task = new Task();
         User user = userService.get(userId);
         task.setUser(user);
+        task.setStatus(Status.OPEN);
         model.addAttribute("task", task);
         model.addAttribute("title", "Create Task");
         model.addAttribute("submit", "Create Task");
@@ -121,9 +123,41 @@ public class UserController {
                            @RequestParam("finishDate") String finishDate, RedirectAttributes ra) {
         task.setFinishDate(finishDate);
         task.setStatus(Status.valueOf(status));
-        taskRepository.save(task);
+        taskService.save(task);
         ra.addFlashAttribute("message", "The task was saved successfully.");
         return "redirect:/" + task.getUser().getId();
+    }
+
+    @GetMapping("/edit-task/{id}")
+    public String editTask(@PathVariable("id") Long id, Model model, RedirectAttributes ra) throws TaskNotFoundException {
+        try {
+            Task task = taskService.get(id);
+            model.addAttribute("task", task);
+            model.addAttribute("title", "Edit the task (Id: " + id + ")");
+            model.addAttribute("submit", "Edit the task");
+            ra.addFlashAttribute("message", "The task has been saved successfully.");
+            return "/add-task";
+        } catch (TaskNotFoundException e) {
+            Task task = taskService.get(id);
+            return "redirect:/" + task.getUser().getId();
+        }
+    }
+
+    @GetMapping("/delete-task/{id}")
+    public String deleteTask(@PathVariable("id") Long id, RedirectAttributes ra) {
+        try {
+            User user = taskService.get(id).getUser();
+            taskService.delete(id);
+            ra.addFlashAttribute("message", "The task was deleted successfully.");
+            return "redirect:/" + user.getId();
+        } catch (TaskNotFoundException e) {
+            return "redirect:/";
+        }
+    }
+
+    @GetMapping("/sign-out")
+    public String signOut() {
+        return "/login";
     }
 
 }
