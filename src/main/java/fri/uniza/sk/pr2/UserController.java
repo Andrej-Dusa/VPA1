@@ -12,11 +12,11 @@ import java.util.List;
 @Controller
 public class UserController {
     private final UserService userService;
-    private final TaskService taskService;
+    private final TaskRepository taskRepository;
 
-    public UserController(UserService userService, TaskService taskService) {
+    public UserController(UserService userService, TaskRepository taskRepository) {
         this.userService = userService;
-        this.taskService = taskService;
+        this.taskRepository = taskRepository;
     }
 
     @GetMapping("/users.html")
@@ -75,9 +75,9 @@ public class UserController {
     @PostMapping("/afterLogin")
     public String afterLogin(User user, RedirectAttributes ra) {
         try {
-            userService.login(user.getName(), user.getPassword());
+            user = userService.login(user.getName(), user.getPassword());
             ra.addFlashAttribute("user.id", user.getId());
-            return "redirect:/{user.id}";
+            return "redirect:/" + user.getId();
         } catch (UserNotFoundException e) {
             ra.addFlashAttribute("message", "Account with this username or password does not exist.");
             return "redirect:/login.html";
@@ -88,12 +88,21 @@ public class UserController {
     public String showTaskList(@PathVariable("id") Long id, Model model) {
         try {
             User user = userService.get(id);
-            List<Task> listOfTasks = taskService.findAllByUser(user);
+            List<Task> listOfTasks = taskRepository.findAllByUser(user);
             model.addAttribute("listOfTasks", listOfTasks);
+            model.addAttribute("id", user.getId());
             return "index";
         } catch (UserNotFoundException e) {
             return "redirect:/login.html";
         }
+    }
+
+    @GetMapping("/add-task.html")
+    public String addTask(Model model) {
+        model.addAttribute("task", new Task());
+        model.addAttribute("title", "Create Task");
+        model.addAttribute("submit", "Create Task");
+        return "add-task";
     }
 
 }

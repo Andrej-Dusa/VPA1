@@ -277,7 +277,11 @@
       <li class="nav-heading">Menu</li>
 
       <li class="nav-item">
-        <a class="nav-link " href="index.html">
+        <a class="nav-link" th:if="${id != null}" th:href="@{'/' + ${id}}" >
+          <i class="bi bi-grid"></i>
+          <span>Tasks</span>
+        </a>
+        <a class="nav-link" th:unless="${id != null}" th:href="@{/}" >
           <i class="bi bi-grid"></i>
           <span>Tasks</span>
         </a>
@@ -343,7 +347,10 @@
       <h1>Dashboard</h1>
       <nav>
         <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a href="index.html">Home</a></li>
+          <li class="breadcrumb-item">
+            <a th:if="${id != null}" th:href="@{'/' + ${id}}" >Home</a>
+            <a th:unless="${id != null}" th:href="@{/}">Home</a>
+          </li>
           <li class="breadcrumb-item active">Dashboard</li>
         </ol>
       </nav>
@@ -564,7 +571,13 @@
 
                 <div class="card-body">
                   <h5 class="card-title">Tasks</h5>
-
+                  <div th:if="${id} != null">
+                    <div>
+                      <a href="add-task.html">
+                        <button type="button" class="btn btn-dark rounded-pill">Add</button>
+                      </a>
+                    </div>
+                  </div>
                   <table class="table table-borderless datatable">
                     <thead>
                       <tr>
@@ -576,13 +589,30 @@
                       </tr>
                     </thead>
                     <tbody>
+                    <th:block th:each="task : ${listOfTasks}">
                       <tr>
-                        <th scope="row"><a href="#">#2457</a></th>
-                        <td><a href="#" class="text-primary">At praesentium minu</a></td>
-                        <td>$64</td>
-                        <td><span class="badge bg-success">Approved</span></td>
-                        <td>Brandon Jacob</td>
+                        <th scope="row">[[${task.id}]]</th>
+                        <td>[[${task.shortName}]]</td>
+                        <td th:text="${#temporals.until(task.finishDate, #dates.createNow()).toDays()}"></td>
+                        <td>
+                          <!-- Use th:switch to conditionally display text based on the status -->
+                          <span th:switch="${task.status}">
+                          <!-- Define cases for each status -->
+                           <span th:case="OPEN">Created</span>
+                          <span th:case="ONHOLD">In Progress</span>
+                          <span th:case="FINISHED">Completed</span>
+                        </span>
+                        </td>
+                        <td>
+                          <a th:href="@{'/edit-user/' + ${user.id}}">
+                            <button type="button" class="btn btn-dark rounded-pill">Edit</button>
+                          </a>
+                          <a th:href="@{'/delete-user/' + ${user.id}}">
+                            <button type="button" class="btn btn-dark rounded-pill">Delete</button>
+                          </a>
+                        </td>
                       </tr>
+                    </th:block>
                     </tbody>
                   </table>
 
