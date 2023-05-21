@@ -15,16 +15,7 @@ public class User {
     private String password;
     private Boolean admin;
     private String email;
-    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinTable(
-            name = "user_task_table",
-            joinColumns = {
-                    @JoinColumn(name = "user_id", referencedColumnName = "id")
-            },
-            inverseJoinColumns = {
-                    @JoinColumn(name = "task_id", referencedColumnName = "id")
-            }
-    )
+    @ManyToMany(targetEntity = Task.class, cascade = CascadeType.ALL)
     private List<Task> tasks = new ArrayList<>();
 
     public User(String name, String password, Boolean admin, String email) {
