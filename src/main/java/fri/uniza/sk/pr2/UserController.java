@@ -1,5 +1,6 @@
 package fri.uniza.sk.pr2;
 
+import jakarta.servlet.http.HttpSession;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -80,9 +81,10 @@ public class UserController {
     }
 
     @PostMapping("/afterLogin")
-    public String afterLogin(User user, RedirectAttributes ra) {
+    public String afterLogin(User user, RedirectAttributes ra, HttpSession session) {
         try {
             user = userService.login(user.getName(), user.getPassword());
+            session.setAttribute("user", user);
             ra.addFlashAttribute("user.id", user.getId());
             return "redirect:/" + user.getId();
         } catch (UserNotFoundException e) {
@@ -97,7 +99,7 @@ public class UserController {
             User user = userService.get(id);
             List<Task> listOfTasks = taskService.getAllByUser(user);
             model.addAttribute("listOfTasks", listOfTasks);
-            model.addAttribute("id", user.getId());
+            model.addAttribute("user", user);
             return "index";
         } catch (UserNotFoundException e) {
             return "redirect:/login.html";
@@ -120,16 +122,19 @@ public class UserController {
 
     @PostMapping("/save-task")
     public String saveTask(Task task, @RequestParam("status") String status,
-                           @RequestParam("finishDate") String finishDate, RedirectAttributes ra) {
+                           @RequestParam("finishDate") String finishDate, RedirectAttributes ra
+                            , HttpSession session) {
         task.setFinishDate(finishDate);
         task.setStatus(Status.valueOf(status));
         taskService.save(task);
         ra.addFlashAttribute("message", "The task was saved successfully.");
-        return "redirect:/" + task.getUser().getId();
+        User user = (User) session.getAttribute("user");
+        return "redirect:/" + user.getId();
     }
 
     @GetMapping("/edit-task/{id}")
-    public String editTask(@PathVariable("id") Long id, Model model, RedirectAttributes ra) throws TaskNotFoundException {
+    public String editTask(@PathVariable("id") Long id, Model model, RedirectAttributes ra
+            , HttpSession session) throws TaskNotFoundException {
         try {
             Task task = taskService.get(id);
             model.addAttribute("task", task);
@@ -139,14 +144,15 @@ public class UserController {
             return "/add-task";
         } catch (TaskNotFoundException e) {
             Task task = taskService.get(id);
-            return "redirect:/" + task.getUser().getId();
+            User user = (User) session.getAttribute("user");
+            return "redirect:/" + user.getId();
         }
     }
 
     @GetMapping("/delete-task/{id}")
-    public String deleteTask(@PathVariable("id") Long id, RedirectAttributes ra) {
+    public String deleteTask(@PathVariable("id") Long id, RedirectAttributes ra, HttpSession session) {
         try {
-            User user = taskService.get(id).getUser();
+            User user = (User) session.getAttribute("user");
             taskService.delete(id);
             ra.addFlashAttribute("message", "The task was deleted successfully.");
             return "redirect:/" + user.getId();
@@ -156,21 +162,24 @@ public class UserController {
     }
 
     @GetMapping("/sign-out")
-    public String signOut() {
-        return "redirect:/login";
+    public String signOut(HttpSession session) {
+        session.invalidate();
+        return "redirect:/login.html";
     }
 
     @GetMapping("/assign-task.html")
-    public String showTaskList(Model model) {
+    public String showTaskList(Model model, HttpSession session) {
         List<Task> listOfTasks = taskService.getAll();
         List<User> listOfUsers = userService.getAll();
         model.addAttribute("listOfUsers", listOfUsers);
         model.addAttribute("listOfTasks", listOfTasks);
+        User user = (User) session.getAttribute("user");
+        model.addAttribute("user", user);
         return "assign-task";
     }
 
-    @GetMapping("/add-task-to.html")
-    public String addTask(Model model) throws UserNotFoundException {
+    @GetMapping("/assign-task-to.html")
+    public String assignTask(Model model) {
         List<User> listOfUsers = userService.getAll();
         Task task = new Task();
         task.setStatus(Status.OPEN);
@@ -178,7 +187,26 @@ public class UserController {
         model.addAttribute("title", "Assign Task");
         model.addAttribute("submit", "Assign Task");
         model.addAttribute("listOfUsers", listOfUsers);
-        return "add-task";
+        return "redirect:/assign-task.html";
+    }
+
+    @GetMapping("/edit-assign-task/{id}")
+    public String editAssignTask(@PathVariable("id") Long id, Model model, RedirectAttributes ra
+            , HttpSession session) throws TaskNotFoundException {
+        try {
+            Task task = taskService.get(id);
+            List<User> listOfUsers = userService.getAll();
+            model.addAttribute("task", task);
+            model.addAttribute("listOfUsers", listOfUsers);
+            model.addAttribute("title", "Edit assigned the task (Id: " + id + ")");
+            model.addAttribute("submit", "Edit assigned the task");
+            ra.addFlashAttribute("message", "The task has been saved successfully.");
+            return "assign-task-to";
+        } catch (TaskNotFoundException e) {
+            Task task = taskService.get(id);
+            User user = (User) session.getAttribute("user");
+            return "redirect:/assign-task.html";
+        }
     }
 
 }

@@ -80,65 +80,58 @@
     <li class="nav-heading">Menu</li>
 
     <li class="nav-item">
-      <a class="nav-link" th:if="${id != null}" th:href="@{'/' + ${id}}" >
+      <a class="nav-link" th:if="${user == null}" th:href="@{/}" >
         <i class="bi bi-grid"></i>
         <span>Tasks</span>
       </a>
-      <a class="nav-link" th:unless="${id != null}" th:href="@{/}" >
+      <a class="nav-link" th:if="${user != null}" th:href="@{'/' + ${user.id}}" >
         <i class="bi bi-grid"></i>
         <span>Tasks</span>
       </a>
     </li><!-- End Dashboard Nav -->
 
 
-    <li class="nav-item">
+    <li class="nav-item" th:if="${user != null} and ${user.admin}">
       <a class="nav-link collapsed" href="users.html">
         <i class="bi bi-person"></i>
         <span>Accounts</span>
       </a>
     </li><!-- End Profile Page Nav -->
 
-    <li class="nav-item">
-      <a class="nav-link collapsed" href="pages-faq.html">
+    <li class="nav-item" th:if="${user != null} and ${user.admin}">
+      <a class="nav-link collapsed" href="assign-task.html">
         <i class="bi bi-question-circle"></i>
-        <span>F.A.Q</span>
+        <span>Assign task</span>
       </a>
     </li><!-- End F.A.Q Page Nav -->
 
-    <li class="nav-item">
-      <a class="nav-link collapsed" href="pages-contact.html">
-        <i class="bi bi-envelope"></i>
-        <span>Contact</span>
+    <li class="nav-item" th:if="${user} != null">
+      <a class="nav-link collapsed" th:href="@{'/edit-user/' + ${user.id}}">
+        <i class="bi bi-person"></i>
+        <span>Profile</span>
       </a>
-    </li><!-- End Contact Page Nav -->
+    </li>
 
-    <li class="nav-item">
+    <li class="nav-item" th:if="(${user} == null) or (${user.admin})">
       <a class="nav-link collapsed" href="add-user.html">
         <i class="bi bi-card-list"></i>
         <span>Register</span>
       </a>
     </li><!-- End Register Page Nav -->
 
-    <li class="nav-item">
+    <li class="nav-item" th:if="${user} == null">
       <a class="nav-link collapsed" href="login.html">
         <i class="bi bi-box-arrow-in-right"></i>
         <span>Login</span>
       </a>
-    </li><!-- End Login Page Nav -->
+    </li>
 
-    <li class="nav-item">
-      <a class="nav-link collapsed" href="pages-error-404.html">
-        <i class="bi bi-dash-circle"></i>
-        <span>Error 404</span>
+    <li class="nav-item" th:if="${user} != null">
+      <a class="nav-link collapsed" th:href="@{/sign-out}">
+        <i class="bi bi-box-arrow-in-right"></i>
+        <span>Sign out</span>
       </a>
-    </li><!-- End Error 404 Page Nav -->
-
-    <li class="nav-item">
-      <a class="nav-link collapsed" href="pages-blank.html">
-        <i class="bi bi-file-earmark"></i>
-        <span>Blank</span>
-      </a>
-    </li><!-- End Blank Page Nav -->
+    </li>
 
   </ul>
 
@@ -189,7 +182,7 @@
 
               <div class="card-body">
                 <h5 class="card-title">Tasks</h5>
-                <div th:if="${id} != null">
+                <div>
                   <div>
                     <a th:href="@{/assign-task-to.html}">
                       <button type="button" class="btn btn-dark rounded-pill">Assign</button>
@@ -201,6 +194,7 @@
                   <tr>
                     <th scope="col">#</th>
                     <th scope="col">Short name</th>
+                    <th scope="col">Username</th>
                     <th scope="col">Finishing Date</th>
                     <th scope="col">Status</th>
                     <th scope="col">Options</th>
@@ -211,6 +205,7 @@
                     <tr>
                       <th scope="row">[[${task.id}]]</th>
                       <td>[[${task.shortName}]]</td>
+                      <td>[[${task.user.getName()}]]</td>
                       <td th:text="${task.finishDate}"></td>
                       <td>
                           <span th:switch="${task.status.name()}">
@@ -220,7 +215,7 @@
                           </span>
                       </td>
                       <td>
-                        <a th:href="@{'/edit-task/' + ${task.id}}">
+                        <a th:href="@{'/edit-assign-task/' + ${task.id}}">
                           <button type="button" class="btn btn-dark rounded-pill small-button">Edit</button>
                         </a>
                         <a th:href="@{'/delete-task/' + ${task.id}}">

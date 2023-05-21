@@ -67,13 +67,14 @@
                 <form class="row g-3 needs-validation" novalidate th:action="@{/save-task}"  method="post" th:object="${task}">
 
                   <input type="hidden" th:field="*{id}">
-                  <input type="hidden" th:field="*{user}">
 
                   <div class="row mb-3">
-                    <label class="col-sm-2 col-form-label">Select</label>
+                    <label class="col-sm-2 col-form-label">Accounts</label>
                     <div class="col-sm-10">
-                      <select class="form-select" aria-label="Default select example">
-                        <option selected></option>
+                      <select class="form-select" name="user" aria-label="Select user">
+                        <th:block th:each="user : ${listOfUsers}">
+                          <option  th:text="${user.name}" th:value="${user.id}"></option>
+                        </th:block>
                       </select>
                     </div>
                   </div>
