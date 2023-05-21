@@ -15,15 +15,19 @@ public class Task {
     private String finishDate;
     @Enumerated(EnumType.ORDINAL)
     private Status status;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
 
     public Task() {
     }
 
-    public Task(String shortName, String description, String finishDate, Status status) {
+    public Task(String shortName, String description, String finishDate, Status status, User user) {
         this.shortName = shortName;
         this.description = description;
         this.finishDate = finishDate;
         this.status = status;
+        this.user = user;
     }
 
     public Long getId() {
@@ -64,5 +68,13 @@ public class Task {
 
     public void setShortName(String shortName) {
         this.shortName = shortName;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 }

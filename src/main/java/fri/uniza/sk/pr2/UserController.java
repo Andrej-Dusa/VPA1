@@ -12,11 +12,11 @@ import java.util.List;
 @Controller
 public class UserController {
     private final UserService userService;
-    private final TaskRepository taskRepository;
+    private final TaskService taskService;
 
-    public UserController(UserService userService, TaskRepository taskRepository) {
+    public UserController(UserService userService, TaskService taskService) {
         this.userService = userService;
-        this.taskRepository = taskRepository;
+        this.taskService = taskService;
     }
 
     @GetMapping("/users.html")
@@ -76,18 +76,24 @@ public class UserController {
     public String afterLogin(User user, RedirectAttributes ra) {
         try {
             userService.login(user.getName(), user.getPassword());
-            return "redirect:/";
+            ra.addFlashAttribute("user.id", user.getId());
+            return "redirect:/{user.id}";
         } catch (UserNotFoundException e) {
             ra.addFlashAttribute("message", "Account with this username or password does not exist.");
             return "redirect:/login.html";
         }
     }
 
-    @GetMapping("/users.html")
-    public String showTaskList(Model model) {
-        List<Task> listOfTasks = taskRepository.;
-        model.addAttribute("listOfUsers", listOfTasks);
-        return "users";
+    @GetMapping("/{id}")
+    public String showTaskList(@PathVariable("id") Long id, Model model) {
+        try {
+            User user = userService.get(id);
+            List<Task> listOfTasks = taskService.findAllByUser(user);
+            model.addAttribute("listOfTasks", listOfTasks);
+            return "index";
+        } catch (UserNotFoundException e) {
+            return "redirect:/login.html";
+        }
     }
 
 }

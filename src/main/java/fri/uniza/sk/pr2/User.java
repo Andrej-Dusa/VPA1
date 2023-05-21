@@ -2,6 +2,7 @@ package fri.uniza.sk.pr2;
 
 import jakarta.persistence.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -15,8 +16,7 @@ public class User {
     private Boolean admin;
     private String email;
     @OneToMany(targetEntity = Task.class, cascade = CascadeType.ALL)
-    @JoinColumn(name = "task_id", referencedColumnName = "id")
-    private List<Task> tasks;
+    private List<Task> tasks = new ArrayList<>();
 
     public User(String name, String password, Boolean admin, String email) {
         this.name = name;

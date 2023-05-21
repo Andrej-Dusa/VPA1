@@ -6,5 +6,6 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface TaskRepository extends CrudRepository<Task, Long> {
+public interface TaskService extends CrudRepository<Task, Long> {
+    public List<Task> findAllByUser(User user);
 }
